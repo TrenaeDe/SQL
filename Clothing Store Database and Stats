@@ -1,0 +1,35 @@
+--Create a clothing store database
+
+CREATE TABLE pnp_stock (id INTEGER PRIMARY KEY, item_name TEXT, clothing_type TEXT, price INTEGER, quantity INTEGER);
+
+INSERT INTO pnp_stock VALUES (1, 'Pearlie', 'Silk Mini Dress', 14.99, 25);
+INSERT INTO pnp_stock VALUES (2, 'Opal', 'Cropped Tank', 6.99, 30);
+INSERT INTO pnp_stock VALUES (3, 'Sapphire', 'Silk Medi Dress', 14.99, 25);
+INSERT INTO pnp_stock VALUES (4, 'Rose Quarts', 'Silk Mini Dress', 14.99, 25);
+INSERT INTO pnp_stock VALUES (5, 'Bronze', 'Silk Maxi Dress', 14.99, 25); 
+INSERT INTO pnp_stock VALUES (6, 'Onyx', 'Tight Jumpsuit', 16.99, 30);
+INSERT INTO pnp_stock VALUES (7, 'Robins Egg', 'Tight Romper', 14.99, 25);
+INSERT INTO pnp_stock VALUES (8, 'Peridot', 'Tight Romper', 14.99, 25);
+INSERT INTO pnp_stock VALUES (9, 'Amathesist', 'Shorts Set', 12.99, 25);
+INSERT INTO pnp_stock VALUES (10, 'Fine China', 'Silk Medi Dress', 14.99, 25);
+INSERT INTO pnp_stock VALUES (11, 'Babe', 'Tight Dress', 14.99, 25); 
+INSERT INTO pnp_stock VALUES (12, 'Slink', 'Leggings', 12.99, 30);
+INSERT INTO pnp_stock VALUES (13, 'Slink Top', 'Stylish Shirt', 10.99, 30);
+INSERT INTO pnp_stock VALUES (14, 'Teddy', 'Cardigain', 14.99, 30);
+INSERT INTO pnp_stock VALUES (15, 'Teddy Set', 'Leggings Set', 14.99, 25);
+INSERT INTO pnp_stock VALUES (16, 'Teddy Dress', 'Tight Dress', 14.99, 25);
+
+--display the database ordered by price.
+SELECT *
+FROM pnp_stock
+ORDER BY price asc;
+
+--What is the total amount of clothing in stock?
+SELECT SUM(quantity) as total_stock
+FROM pnp_stock;
+
+--What is the average price of a clothing type that is a dress within our clothing store?
+SELECT AVG(price) as avg_price
+FROM pnp_stock
+WHERE clothing_type like '%Dress';
+
