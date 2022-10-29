@@ -50,16 +50,48 @@ INSERT INTO marvels VALUES(26, "Professor X", 58, "Good", "Male", 1.83, 86, "EUA
 
 -- What are the adverage, max, min values in the data?
 
-/* MAX */
-SELECT name, alignment, intelligence, MAX(strength) AS strongest, speed, durability, energy_Projection, fighting_Skills
+/* Stongest marvel character according to this table using the MAXIMUM function, also using the HAVING function to bring forth every character with the highest strength of 7.*/
+
+SELECT name, MAX(strength) AS 'strongest_marv'
+FROM marvels
+GROUP BY name
+HAVING strength = 7;
+
+/* Least popular marvel character according to this table using the MINIMUM function.*/
+
+SELECT name, MIN(popularity) AS 'least_pop'
 FROM marvels;
 
-/* MIN */
-SELECT name, MIN(popularity) AS least_pop, alignment, intelligence, strength, speed, durability, energy_Projection, fighting_Skills
+/* List of marvel characters whose fighting_Skills are above this table's AVERAGE.*/
+
+SELECT name, fighting_Skills
+FROM marvels
+WHERE fighting_Skills > (SELECT AVG(fighting_Skills) AS 'avg_fightskill'
+                         FROM marvels);
+
+/* What ways are there to group the data values that don't exist yet (using CASE)?*/
+
+/* Ranking fighting_Skill from high to low using CASE function.*/
+SELECT name, alignment,
+    CASE
+           WHEN fighting_Skills >= 6 THEN 'High Skill'
+           WHEN fighting_Skills >= 4 THEN 'Medi Skill'
+           ELSE 'Low Skill'
+        END AS 'marv_skill'
 FROM marvels;
 
-/* AVG */
-SELECT name, AVG(fighting_Skills) AS avg_fightskill
-FROM marvels;
+/* What interesting ways are there to filter the data (using AND/OR)?*/
 
-/* What about those numbers per category in the data (using HAVING)?*/
+/* Using AND operator to find good marvel fighters.*/
+SELECT name, alignment, fighting_Skills, strength
+FROM marvels
+WHERE fighting_Skills >= 5 AND strength >= 4;
+
+/* Retrieving all intelligent marvels that may or may not live in USA, using the OR operator.*/
+SELECT name, alignment, hometown, intelligence
+FROM marvels
+WHERE intelligence >=4 OR hometown = 'USA';
+
+--SELECT * FROM marvels
+
+
