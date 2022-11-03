@@ -1,0 +1,123 @@
+/* Create table about the people and what they do here */
+
+/* Created a table of Actresses names and age.*/
+CREATE TABLE actresses (id INTEGER PRIMARY KEY, 
+    name TEXT,
+    age INTEGER);
+    
+INSERT INTO actresses (name, age)
+    VALUES ('Sandra Bullock', 58);
+INSERT INTO actresses (name, age)  
+    VALUES ('Jennifer Aniston', 53);
+INSERT INTO actresses (name, age)
+    VALUES ('Reese Witherspoon', 46);
+INSERT INTO actresses (name, age)
+    VALUES ('Jennifer Lopez', 53);
+INSERT INTO actresses (name, age)
+    VALUES ('Halle Berry', 56);
+INSERT INTO actresses (name, age)
+    VALUES ('Meagan Good', 41);
+INSERT INTO actresses (name, age)
+    VALUES ('Taraji P. Henson', 52);
+INSERT INTO actresses (name, age)
+    VALUES ('Jennifer Lawrence', 32);
+INSERT INTO actresses (name, age)
+    VALUES ('Zendaya', 26);
+INSERT INTO actresses (name, age)
+    VALUES ('Anne Hathaway', 39);
+INSERT INTO actresses (name, age)
+    VALUES ('Jessica Alba', 41);    
+INSERT INTO actresses (name, age)
+    VALUES ('Salma Hayek', 56);    
+INSERT INTO actresses (name, age)
+    VALUES ('Penelope Cruz', 48);    
+INSERT INTO actresses (name, age)
+    VALUES ('Viola Davis', 57);
+INSERT INTO actresses (name, age)
+    VALUES ('Zoe Saldana', 44);
+
+/* Created a table of favorite and recent movies the provided actress starred in.*/
+CREATE TABLE movies_tv (id INTEGER PRIMARY KEY,
+    actress_id INTEGER,
+    fav_movie TEXT,
+    rec_movie TEXT);
+
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (1, 'The Proposal', 'Bullet Train');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (2, 'Friends', 'Friends: The Reunion');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (3, 'Legally Blonde', 'Sing 2');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (4, 'The Back-up Plan', 'Marry Me');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (5, 'Catwoman', 'Moonfall');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (6, 'Roll Bounce', 'Day Shift');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (7, 'Baby Boy', 'Minions: The Rise of Gru');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (8, 'The Hunger Games', 'Causeway');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (9, 'Dune', 'Spider-Man: No Way Home');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (10, 'The Princess Diaries', 'Armageddon Time');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (11, 'Honey', 'L.A.s Finest');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (12, 'Grown Ups', 'Puss in Boots: The Last Wish');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (13, 'Bandidas', 'On the Fringe');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (14, 'Law Abiding Citizen', 'Black Adam');
+INSERT INTO movies_tv (actress_id, fav_movie, rec_movie)
+    VALUES (15, 'Avatar', 'Avatar: The Way of Water');
+
+/* Created a table of Fun Facts about provided actress.*/
+CREATE TABLE fun_facts (id INTEGER PRIMARY KEY,
+    actress_id INTEGER,
+    hometown TEXT,
+    fact TEXT);
+
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (1, 'Arlington County, Virginia', 'speaks German');
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (2, 'Sherman Oaks, California', 'parents were actors');  
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (3, 'New Orleans, Louisiana', 'can sing');    
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (4, 'The Bronx, New York City, New York', 'was a backup dancer for Janet Jackson');    
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (5, 'Cleveland, Ohio', 'the first Black Woman to win the Academy Award for Best Actress in 2002 & still is');  
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (6, 'Panorama City, Los Angeles, California', 'started acting at four');    
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (7, 'Washington, D.C.', 'had a triple threat scholarship at Howard University');    
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (8, 'Indian Hills, Kentucky', 'grew up as a massive tomboy');
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (9, 'Oakland, California', 'used to be super shy and had to attend seminars for timid children');
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (10, 'Brooklyn, New York City, New York', 'huge football fan, favorite teams are the New York Giants and the San Diego Chargers');
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (11, 'Pomona, California', 'co_founded The Honest Company');
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (12, 'Coatzacoalcos, Mexico', 'comes from a wealthy family in Mexico, her father owns an oil and industrial equipment firm');
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (13, 'Municipality of Alcobendas, Spain', 'started a foundation in India to help homeless girls');
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (14, 'Saint Matthews, South Carolina', 'Viola read the book Confessions of a Sociopath, in order to help her portray her role: Amanda Waller in Suicide Squad');
+INSERT INTO fun_facts (actress_id, hometown, fact)
+    VALUES (15, 'Passaic, New Jersey', 'Zoe is of Afro-Dominican descent');
+
+/* Using a Join to display a table showing  the actresses name, age, hometown and fact.*/
+SELECT a.name, a.age, f.hometown, f.fact
+FROM actresses AS a
+    JOIN fun_facts AS f
+      ON a.id = f.actress_id;
+
+/* Using a Join to bring forth the actresses name, my favorite movie starring them and a recent movie starring them.*/
+SELECT a.name, m.fav_movie, m.rec_movie
+FROM actresses AS a
+    JOIN movies_tv AS m
+      ON a.id = m.actress_id;
