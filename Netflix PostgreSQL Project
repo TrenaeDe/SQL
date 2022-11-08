@@ -1,0 +1,54 @@
+-- Example query (PostgreSQL)
+SELECT * FROM "CharlotteChaze/BreakIntoTech"."netflix_titles_info" LIMIT 5;
+
+-- In this SQL code, I'm querying a daabase that's holding Netflix data to answer questions about the data.
+
+-- Joining both tables together.
+SELECT nti.show_id, nti.type, nti.title, nti.rating, np.director,
+       np.cast
+FROM "CharlotteChaze/BreakIntoTech"."netflix_titles_info" AS nti
+    LEFT JOIN "CharlotteChaze/BreakIntoTech"."netflix_people" AS np
+      ON nti.show_id = np.show_id;
+
+-- 1. How many movie titles are there in the database? (movies only, not tv shows)
+SELECT COUNT(type)
+FROM "CharlotteChaze/BreakIntoTech"."netflix_titles_info"
+WHERE type = 'Movie';
+
+-- 2. When was the most recent batch of tv shows and/or movies added to the database?
+SELECT MAX(date(date_added))
+FROM "CharlotteChaze/BreakIntoTech"."netflix_titles_info";
+
+-- 3. List all the movies and tv shows in alphabetical order.
+SELECT type, title
+FROM "CharlotteChaze/BreakIntoTech"."netflix_titles_info"
+ORDER BY title asc;
+
+-- 4. Who was the Director for the movie 'Bright Star'?
+SELECT np.director, nti.title
+FROM "CharlotteChaze/BreakIntoTech"."netflix_people" AS np
+    LEFT JOIN "CharlotteChaze/BreakIntoTech"."netflix_titles_info" AS nti
+      ON np.show_id = nti.show_id
+WHERE nti.title = 'Bright Star';
+
+-- 5. What is the oldest movie in the database and what year was it made?
+SELECT title, release_year
+FROM "CharlotteChaze/BreakIntoTech"."netflix_titles_info" 
+ORDER BY release_year asc 
+LIMIT 1;
+
+-- Or using a subquery like the one below to see all the oldest movies without assuming that there was only 1 that year.
+SELECT title, release_year
+FROM "CharlotteChaze/BreakIntoTech"."netflix_titles_info"
+WHERE type = 'Movie' AND release_year <= (SELECT MIN(release_year)
+                                          FROM "CharlotteChaze/BreakIntoTech"."netflix_titles_info"
+                                          WHERE type = 'Movie');
+
+
+-- Tips:
+-- (*) Table names containing punctuation, capitalization, or spaces should be
+--     quoted, e.g. "Test Data.csv".
+-- (*) Add more data by using the Upload Data button.
+-- (*) Create additional schemas for namespacing your tables, e.g. "CREATE SCHEMA my_schema;".
+-- (*) When querying tables created outside of the public (default) schema,
+--     be sure to specify the desired schema, e.g. "SELECT * FROM my_schema."my data.csv";".
