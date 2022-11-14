@@ -1,0 +1,53 @@
+/* For this project, I downloaded Spotify data from Kaggle. 
+Then I created a table to insert Spotify data into. 
+Finally, I performed analytics on the data using SQL. */
+
+CREATE TABLE BIT_DB.Spotifydata (
+                                 id INTEGER PRIMARY KEY,
+                                 artist_name VARCHAR NOT NULL,
+                                 track_name VARCHAR NOT NULL,
+                                 track_id VARCHAR NOT NULL,
+                                 popularity INTEGER NOT NULL,
+                                 danceability DECIMAL(4,3) NOT NULL,
+                                 energy DECIMAL(4,3) NOT NULL,
+                                 key INTEGER NOT NULL,
+                                 loudness DECIMAL(5,3) NOT NULL,
+                                 mode INTEGER NOT NULL,
+                                 speechiness DECIMAL(5,4) NOT NULL,
+                                 acoustiness DECIMAL(6,5) NOT NULL,
+                                 instrumentalness TEXT NOT NULL,
+                                 liveness DECIMAL(5,4) NOT NULL,
+                                 valence DECIMAL(4,3) NOT NULL,
+                                 tempo DECIMAL(6,3) NOT NULL,
+                                 duration_ms INTEGER NOT NULL,
+                                 time_signature INTEGER NOT NULL
+                                 );
+        
+/* Then I inserted the Spotify Data .csv into the table.
+Next, I explored the data using the following SQL. */  
+
+SELECT *
+FROM BIT_DB.Spotifydata;
+
+-- What is the top 15 artists and their songs (based on popularity)?
+SELECT artist_name, track_name, popularity
+FROM BIT_DB.Spotifydata
+ORDER BY popularity desc
+LIMIT 15;
+
+-- Which song has the most danceabilty? which song has the least?
+SELECT artist_name, track_name, MAX(danceability) AS Hype
+FROM BIT_DB.Spotifydata;
+
+SELECT artist_name, track_name, MIN(danceability) AS Least
+FROM BIT_DB.Spotifydata;
+
+-- What is the average timeframe for a song based on the data we have collected?
+SELECT AVG(duration_ms)
+FROM BIT_DB.Spotifydata;
+
+-- List all songs with a popularity of at least 80 and a high danceability?
+SELECT artist_name, track_name, popularity, danceability
+FROM BIT_DB.Spotifydata
+WHERE popularity >= 80 AND danceability > 0.700;
+
