@@ -1,0 +1,246 @@
+      -- Chinook Final Project--
+-- Here are potential answers to the example questions in the final SQL project.
+-- Note that there are often multiple ways to write SQL to come up with the same answer.
+
+SELECT *
+FROM customers;
+
+SELECT *
+FROM employees;
+
+SELECT *
+FROM artists;
+
+SELECT *
+FROM invoices;
+
+-- #1. Show Customers (their full names, customer ID, and country) who are not in the US. (Hint: != or <> can be used to say 'is not equal to'.)
+
+SELECT  FirstName, LastName, CustomerId, Country
+FROM chinook.customers
+WHERE Country <> 'USA';
+
+-- #2. Show only the Customers from Brazil.
+
+SELECT *
+FROM chinook.customers
+WHERE Country = 'Brazil';
+
+-- #3. Find the Invoices of customers who are from Brazil. The resulting table should show the customer's full name, Invoice ID, Date of the invoice, and billing country.
+
+SELECT c.FirstName, c.LastName, i.InvoiceId, i.InvoiceDate, i.BillingCountry
+FROM chinook.invoices AS i
+    LEFT JOIN chinook.customers AS c
+           ON i.CustomerId = c.CustomerId
+WHERE i.BillingCountry = 'Brazil';
+
+-- #4. Show the Employees who are Sales Agents.
+
+SELECT *
+FROM chinook.employees
+WHERE Title LIKE 'Sales%Agent';
+
+-- #5. Find a unique/distinct list of billing countries from the Invoice table.
+
+SELECT DISTINCT BillingCountry
+FROM chinook.invoices;
+
+-- #6. Provide a query that shows the invoices associated with each sales agent. The resulting table should include the Sales Agent's full name.
+
+SELECT e.LastName AS 'Emp_LN', e.FirstName AS 'Emp_FN', i.InvoiceId
+FROM chinook.employees AS e
+    INNER JOIN chinook.customers AS c
+            ON e.employeeId = c.SupportRepId
+    INNER JOIN chinook.invoices AS i
+            ON c.CustomerId = i.CustomerId;
+
+-- #7. Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+
+SELECT i.Total, c.FirstName AS 'Cust_FN', c.LastName AS 'Cust_LN', c.Country, e.LastName AS 'Emp_LN', e.FirstName AS 'Emp_FN'
+FROM chinook.invoices AS i
+    INNER JOIN chinook.customers AS c
+            ON i.CustomerId = c.CustomerId
+    INNER JOIN chinook.employees AS e
+            ON c.SupportRepId = e.employeeId;
+
+-- #8. How many Invoices were there in 2009?
+
+SELECT COUNT(InvoiceDate)
+FROM chinook.invoices
+WHERE InvoiceDate LIKE '2009%';
+-- ( OR )
+SELECT COUNT(*)
+FROM chinook.invoices
+WHERE InvoiceDate BETWEEN '2009-01-01' AND '2009-12-31';
+
+-- #9. What are the total sales for 2009?
+
+SELECT SUM(Total) AS Total_Sales
+FROM chinook.invoices
+WHERE InvoiceDate BETWEEN '2009-01-01' AND '2009-12-31';
+
+-- #10. Write a query that includes the purchased track name with each invoice line ID.
+
+SELECT t.Name AS 'Track', i.InvoiceLineId
+FROM chinook.invoice_items AS  i
+    INNER JOIN chinook.tracks AS t
+            ON i.TrackId = t.TrackId;
+
+-- #11. Write a query that includes the purchased track name AND artist name with each invoice line ID.
+
+SELECT t.Name AS 'Track', a.Name AS 'Artist', i.InvoiceLineId
+FROM chinook.invoice_items AS i
+    LEFT JOIN chinook.tracks AS t
+            ON i.TrackId = t.TrackId
+    INNER JOIN chinook.albums AS alb
+            ON t.AlbumId = alb.AlbumId
+    LEFT JOIN chinook.artists AS a
+            ON alb.ArtistId = a.ArtistId;
+
+-- #12. Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+
+SELECT t.Name AS 'Track', a.Title AS 'Album', mt.Name AS 'Media_Type', g.Name AS 'Genre'
+FROM chinook.tracks AS t
+    INNER JOIN chinook.albums AS a
+            ON t.AlbumId = a.AlbumId
+    INNER JOIN chinook.media_types AS mt
+            ON t.MediaTypeId = mt.MediaTypeId
+    INNER JOIN chinook.genres AS g
+            ON t.GenreId = g.GenreId;
+
+-- #13. Show the total sales made by each sales agent.
+
+SELECT e.LastName AS 'Emp_LN', e.FirstName AS 'Emp_FN', ROUND(SUM(i.Total), 2) AS 'Total_Sales'
+FROM chinook.employees AS e
+    INNER JOIN chinook.customers AS c
+            ON e.EmployeeId = c.supportRepId
+    INNER JOIN chinook.invoices AS i
+            ON c.CustomerId = i.CustomerId
+GROUP BY Emp_LN, Emp_FN;
+
+-- #14. Which sales agent made the most dollars in sales in 2009?
+
+SELECT e.LastName AS 'Emp_LN', e.FirstName AS 'Emp_FN', ROUND(SUM(i.Total), 2) AS 'Total_Sales'
+FROM chinook.employees AS e
+    INNER JOIN chinook.customers AS c
+            ON e.EmployeeId = c.supportRepId
+    INNER JOIN chinook.invoices AS i
+            ON c.CustomerId = i.CustomerId
+WHERE i.InvoiceDate LIKE '2009%'
+GROUP BY Emp_LN, Emp_FN
+ORDER BY Total_Sales desc
+LIMIT 1;
+
+-- #15. List all customers who live in the USA, Brazil, and France.
+
+SELECT * 
+FROM chinook.customers
+WHERE Country = 'USA' OR Country = 'Brazil' OR Country = 'France';
+
+-- #16. Find the number of tracks that we have, artist 'Led Zeppelin' recorded.
+
+SELECT COUNT(t.Name)
+FROM chinook.artists AS a
+    INNER JOIN chinook.albums AS alb
+            ON a.ArtistId = alb.ArtistId
+    INNER JOIN chinook.tracks AS t
+            ON alb.AlbumId = t.AlbumId
+WHERE a.Name = 'Led Zeppelin';
+-- ( double checking answer )
+SELECT *
+FROM chinook.artists AS a
+    INNER JOIN chinook.albums AS alb
+            ON a.ArtistId = alb.ArtistId
+    INNER JOIN chinook.tracks AS t
+            ON alb.AlbumId = t.AlbumId
+WHERE a.Name = 'Led Zeppelin'; 
+ 
+-- #17. List at least 20 artist names, track names, and their album names.
+
+SELECT a.Name AS 'Artist', t.Name AS 'Track', alb.Title
+FROM chinook.artists AS a
+    INNER JOIN chinook.albums AS alb
+            ON a.ArtistId = alb.ArtistId
+    INNER JOIN chinook.tracks AS t
+            ON alb.AlbumId = t.AlbumId
+LIMIT 20;
+
+-- #18. List the Top 8 Invoices with their billing country, billing city, and total amount bought.
+
+SELECT BillingCity, BillingCountry, Total
+FROM chinook.invoices
+ORDER BY Total desc
+LIMIT 8;
+
+-- #19. List 20 track songs, the artist and the price for each from highest to lowest.
+
+SELECT t.name AS 'Track', a.Name AS 'Artist', t.UnitPrice
+FROM chinook.tracks AS t
+    INNER JOIN chinook.albums AS alb
+            ON t.AlbumId = alb.AlbumId
+    INNER JOIN chinook.artists AS a
+            ON alb.ArtistId = a.ArtistId
+ORDER BY t.UnitPrice desc
+LIMIT 20;
+
+-- #20. List all albums and track names for artist named 'Passengers'.
+
+SELECT alb.Title AS 'Album', t.name AS 'Track'
+FROM chinook.artists AS a
+    INNER JOIN chinook.albums AS alb
+            ON a.ArtistId = alb.ArtistId
+    INNER JOIN chinook.tracks AS t
+            ON alb.AlbumId = t.AlbumId
+WHERE a.Name = 'Passengers';
+
+-- #21. List all composers with 'Glover' within their name.
+
+SELECT *
+FROM chinook.tracks
+WHERE Composer LIKE '%Glover%';
+
+-- #22. List the 5 highest priced 'Queen' tracks sold.
+
+SELECT t.Name AS 'Track', t.UnitPrice
+FROM chinook.artists AS a
+    LEFT JOIN chinook.albums AS alb
+           ON a.ArtistId = alb.ArtistId
+   INNER JOIN chinook.tracks AS t
+           ON alb.AlbumId = t.AlbumId
+WHERE a.Name = 'Queen' 
+ORDER BY t.UnitPrice desc
+LIMIT 5;
+
+-- #23. What were the 8 highest priced sold tracks between 2013-10-01 and 2013-12-22?
+
+SELECT t.Name AS 'Track', i.InvoiceDate, ii.UnitPrice
+FROM chinook.tracks AS t
+    LEFT JOIN chinook.invoice_items AS ii
+           ON t.TrackId = ii.TrackId
+    RIGHT JOIN chinook.invoices AS i
+            ON ii.InvoiceId = i.InvoiceId
+WHERE InvoiceDate BETWEEN '2013-10-01' AND '2013-12-22'
+ORDER BY ii.UnitPrice desc;
+
+-- #24. Write a query of profile information for Customer #7 returning contact info, Invoice dates and total amount spent each purchase?
+
+SELECT c.CustomerId, c.FirstName, c.LastName, c.Address, c.City, c.State, c.Country, c.PostalCode, c.Phone, c.Fax, c.Email, i.InvoiceDate, i.Total
+FROM chinook.customers AS c
+    INNER JOIN chinook.invoices AS i
+            ON c.CustomerId = i.CustomerId
+WHERE c.CustomerId = 7;
+
+-- #25. Write a query of invoice information for Customer #7 returning track names, and the artist of the track?
+
+SELECT i.InvoiceId, i.CustomerId, i.InvoiceDate, i.BillingAddress, i.BillingCity, i.BillingState, i.BillingCountry, i.BillingPostalCode, i.Total, t.Name AS 'Track', a.Name AS 'Artist'
+FROM chinook.invoices AS i
+    LEFT JOIN chinook.invoice_items AS ii
+           ON i.InvoiceId = ii.InvoiceId
+   LEFT JOIN chinook.tracks AS t
+           ON t.TrackId = ii.TrackId
+   INNER JOIN chinook.albums AS alb
+           ON t.AlbumId = alb.AlbumId
+   LEFT JOIN chinook.artists AS a
+           ON a.ArtistId = alb.ArtistId
+WHERE i.CustomerId = 7;
+
