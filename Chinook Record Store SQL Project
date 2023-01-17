@@ -1,5 +1,5 @@
       -- Chinook Final Project--
--- Here are potential answers to the example questions in the final SQL project.
+-- Here are queries and answers to quantify Chinook's database containing multiple tables of record store data.
 -- Note that there are often multiple ways to write SQL to come up with the same answer.
 
 SELECT *
