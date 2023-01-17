@@ -1,4 +1,4 @@
-/* Created a table called CityBikeLanes in SQLite Studio so we can run queries on it later. */
+/* Created a table called CityBikeLanes in SQLite Studio so we can run practice queries on it later. */
 
 CREATE TABLE BIT_DB.CityBikeLanes (
                                     id INTEGER PRIMARY KEY,
