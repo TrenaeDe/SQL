@@ -1,4 +1,4 @@
---Create a clothing store database
+-- Created a clothing store database, then quantified hypothesized queries.
 
 CREATE TABLE pnp_stock (id INTEGER PRIMARY KEY, item_name TEXT, clothing_type TEXT, price INTEGER, quantity INTEGER);
 
