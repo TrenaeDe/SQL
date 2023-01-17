@@ -128,3 +128,4 @@ SELECT street, safetyrating, AVG(safetyrating) OVER (PARTITION BY street) AS 'Av
            ELSE 'Improvements Needed'
        END AS 'Recommendation'
 FROM CityBikeLanes;
+
