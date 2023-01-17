@@ -1,4 +1,4 @@
-/* Create table about the people and what they do here */
+/* Created multiple tables about Actresses and then joining the tables together. */
 
 /* Created a table of Actresses names and age.*/
 CREATE TABLE actresses (id INTEGER PRIMARY KEY, 
