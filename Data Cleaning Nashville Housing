@@ -1,0 +1,228 @@
+/*
+
+Cleaning Data in SQL Queries
+
+*/
+
+
+SELECT *
+FROM PortfolioProject.dbo.NashvilleHousing;
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Standardize Date Format
+
+SELECT SaleDate, CONVERT(Date, SaleDate)
+FROM PortfolioProject.dbo.NashvilleHousing;
+
+UPDATE NashvilleHousing
+SET SaleDate = CONVERT(Date, SaleDate)
+
+/*  **NOTE**  Above update didnt work initially, so I decided to just add a new column to convert the sale date.*/
+
+ALTER TABLE NashvilleHousing
+ADD SaleDateConverted Date;
+
+UPDATE NashvilleHousing
+SET SaleDateConverted = CONVERT(Date, SaleDate)
+
+/*  **NOTE**  Fact checking if update worked.*/
+
+SELECT SaleDateConverted
+FROM NashvilleHousing;
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Populate Property Address date
+
+SELECT *
+FROM PortfolioProject.dbo.NashvilleHousing
+--WHERE PropertyAddress is null
+ORDER BY ParcelID;
+
+/*  **NOTE**  Multiple ParcelID's with the same id will have the exact same property address. So for a ParcelID 
+with no address populate the address with the same ParcelID address thats already populated.*/ 
+
+SELECT a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress, ISNULL(a.PropertyAddress,b.PropertyAddress)
+FROM NashvilleHousing as a
+JOIN NashvilleHousing as b
+	ON a.ParcelID = b.ParcelID
+	AND a.[UniqueID ] <> b.[UniqueID ]
+WHERE a.PropertyAddress is null;
+
+UPDATE a
+SET PropertyAddress = ISNULL(a.PropertyAddress,b.PropertyAddress)
+FROM NashvilleHousing as a
+JOIN NashvilleHousing as b
+	ON a.ParcelID = b.ParcelID
+	AND a.[UniqueID ] <> b.[UniqueID ]
+WHERE a.PropertyAddress is null;
+
+/*  **NOTE**  Fact checking if query worked.*/
+
+SELECT PropertyAddress
+FROM NashvilleHousing
+WHERE PropertyAddress is null;
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Breaking out Address into Individual Columns (Address, City, State)
+
+SELECT PropertyAddress
+FROM PortfolioProject.dbo.NashvilleHousing;
+
+/* **NOTE**  To break up Property Address, we used the combination of Substring, Charindex(searching for a 
+specific value), and Len; basically taking from property address, then starting from the first value to the 
+comma without adding the comma to get the address(-1). For the city; taking from the property address again, 
+then starting from the comma without adding the comma(+1), stopping at the end of each length of the property 
+address(LEN). */
+
+SELECT
+SUBSTRING(PropertyAddress, 1, CHARINDEX(',', PropertyAddress)-1) as Address
+, SUBSTRING(PropertyAddress, CHARINDEX(',', PropertyAddress)+1, LEN(PropertyAddress)) as Address
+FROM NashvilleHousing;
+
+/*  **NOTE** We can't seperate two values from one column without creating two new columns. */
+
+ALTER TABLE NashvilleHousing
+ADD PropertySplitAddress Nvarchar(255);
+
+UPDATE NashvilleHousing
+SET PropertySplitAddress = SUBSTRING(PropertyAddress, 1, CHARINDEX(',', PropertyAddress)-1);
+
+ALTER TABLE NashvilleHousing
+ADD PropertySplitCity Nvarchar(255);
+
+UPDATE NashvilleHousing
+SET PropertySplitCity = SUBSTRING(PropertyAddress, CHARINDEX(',', PropertyAddress)+1, LEN(PropertyAddress));
+
+/* **NOTE** Fact checking if update worked. ** New columns added at the end. */ 
+
+SELECT *
+FROM NashvilleHousing;
+
+/* **NOTE** Another way to break up a column. */
+
+SELECT OwnerAddress
+FROM NashvilleHousing;
+
+/* **NOTE** PARSENAME is useful for strings delimited by a specific value, parsename looks to separate a string 
+from the periods within the string. Since owneraddress has commas as the separator, we can replace those commas 
+with periods. REPLACE (from which column, look for whatever <commas>, specify what to change it to <change it to 
+a period>. You will also find that parsename runs things backwards so to break up owneraddress into address, 
+city, then last state, break parsenames up for however many separators within a string or what you want to 
+separate from the string <3 in this case> and run the number placement in descending order to return the output 
+in the correct order. */
+
+SELECT 
+PARSENAME(REPLACE(OwnerAddress, ',', '.'),3) 
+,PARSENAME(REPLACE(OwnerAddress, ',', '.'),2) 
+,PARSENAME(REPLACE(OwnerAddress, ',', '.'),1) 
+FROM NashvilleHousing;
+
+/* **NOTE** Now we need to add those columns, and add the values. */
+
+ALTER TABLE NashvilleHousing
+ADD OwnerSplitAddress Nvarchar(255);
+
+UPDATE NashvilleHousing
+SET OwnerSplitAddress = PARSENAME(REPLACE(OwnerAddress, ',', '.'),3);
+
+ALTER TABLE NashvilleHousing
+ADD OwnerSplitCity Nvarchar(255);
+
+UPDATE NashvilleHousing
+SET OwnerSplitCity = PARSENAME(REPLACE(OwnerAddress, ',', '.'),2);
+
+ALTER TABLE NashvilleHousing
+ADD OwnerSplitState Nvarchar(255);
+
+UPDATE NashvilleHousing
+SET OwnerSplitState = PARSENAME(REPLACE(OwnerAddress, ',', '.'),1);
+
+/* **NOTE** Fact checking if update worked. ** New columns added at the end. */ 
+
+SELECT *
+FROM NashvilleHousing;
+
+ 
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Change Y and N to Yes and No in "Sold as Vacant" field
+
+SELECT DISTINCT(SoldAsVacant), COUNT(SoldAsVacant)
+FROM PortfolioProject.dbo.NashvilleHousing
+GROUP BY SoldAsVacant
+ORDER BY 2;
+
+/* **NOTE** Changing Y and N to Yes and No using a Case Statement, then updating the statement into the "Sold as 
+Vacant" column in the table. */
+
+SELECT SoldAsVacant
+,CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
+	  WHEN SoldAsVacant = 'N' THEN 'No'
+	  ELSE SoldAsVacant
+ END
+FROM NashvilleHousing;
+
+
+UPDATE NashvilleHousing
+SET SoldAsVacant = CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
+						WHEN SoldAsVacant = 'N' THEN 'No'
+						ELSE SoldAsVacant
+				   END;
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Remove Duplicates
+
+/* **NOTE** We've queried some window functions to find where there are duplicate values, then created a CTE
+for the query. When removing duplicates; we're going to have duplicate rows and we need to be able to have a way 
+to identify those rows. We're using row_number <ROW_NUMBER adds a unique increasing number to the results grid. 
+The order, in which the row numbers are applied, is determined by the ORDER BY clause> then we are going to 
+partition the data on columns that should be unique to each row <on specifying the value, PARTITION BY divides 
+the result set produced by the FROM clause into partitions to which the ROW_NUMBER function is applied. The 
+values specified in the PARTITION clause define the boundaries of the result set>. Now we will put the query
+within a CTE, <which is almost like a temp table> while selecting all from RowNumCTE in the query below CTE 
+where row_num > 1 and ordered by PropertyAddress. Once Select is executed then change select query to DELETE 
+then comment out the order by clause, then check for duplicates. */
+
+WITH RowNumCTE AS(
+SELECT *, 
+	ROW_NUMBER() OVER (
+	PARTITION BY ParcelID,
+				 PropertyAddress,
+				 SalePrice,
+				 SaleDate,
+				 LegalReference
+				 ORDER BY
+					UniqueID
+					) row_num
+FROM PortfolioProject.dbo.NashvilleHousing
+--ORDER BY ParcelID
+)
+SELECT *
+FROM RowNumCTE
+WHERE row_num > 1
+--ORDER BY PropertyAddress;
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Delete unused Columns
+
+SELECT *
+FROM PortfolioProject.dbo.NashvilleHousing;
+
+/* **NOTE** Deleting columns that we've deemed not useful or no longer useful after above updates to table. */
+
+ALTER TABLE PortfolioProject.dbo.NashvilleHousing
+DROP COLUMN OwnerAddress, TaxDistrict, PropertyAddress;
+
+ALTER TABLE PortfolioProject.dbo.NashvilleHousing
+DROP COLUMN SaleDate;
+
